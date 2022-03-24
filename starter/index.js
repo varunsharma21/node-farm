@@ -63,27 +63,33 @@ const dataObj = JSON.parse(data);
 
 
 const server = http.createServer((req, res) => {
-    const pathName = req.url;
     
-
+    const { query, pathname } = url.parse(req.url, true);
+    
     // Overview
-    if (pathName === '/' || pathName === '/overview') {
+    if (pathname === '/' || pathname === '/overview') {
         res.writeHead(200, {
           'Content-type': 'text/html'
         });
-    
+        
+        // join() method makes a new array into string without changing original array.
         const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('');
         const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
         res.end(output);
     }
 
     // Product
-    else if(pathName === '/product') {
-        res.end('This is PRODUCT');
+    else if(pathname === '/product') {
+        res.writeHead(200, {
+            'Content-type': 'text/html'
+          });
+        const product = dataObj[query.id];
+        const output = replaceTemplate(tempProduct, product);
+        res.end(output);
     }
 
     // API
-    else if(pathName === '/api') {
+    else if(pathname === '/api') {
         // 1. writeHead() property is an inbuilt property of the 'http'
         // module which sends a response header to the request.
         // 2. arguments take status code and an object for content type.
